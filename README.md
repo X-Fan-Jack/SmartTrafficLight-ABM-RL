@@ -18,7 +18,6 @@ word count: 10,000
 
 Literature Review --- 29th, May.
 
-
 ## Data description
 
 Data source: [Road traffic statistics](https://roadtraffic.dft.gov.uk/downloads)
@@ -46,7 +45,7 @@ M for Motorways.
 
 Filename: dft_traffic_counts_raw_counts.csv
 
-Format: shp
+Format: csv
 
 Description:
 
