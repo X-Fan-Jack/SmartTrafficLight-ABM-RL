@@ -4,6 +4,59 @@ Dissertation for MSc Urban Spatial Science, UCL
 
 word count: 10,000
 
+## Outline
+
+1. Introduction
+2. Literature Review
+3. Methodology
+4. Results
+5. Discussion
+6. Conclusion
+
+## Structure
+
+### Introduction
+
+research environment
+
+research background
+
+the importance
+
+research question
+
+### Literature Review
+
+content, method, result of pre-researches.
+
+the relationship between the pre-research and my research
+
+innovation of my research to fill XXX gap.
+
+### Methodology
+
+how to reach the research question.
+
+general narrative of the technical path.
+
+### Results
+
+using tables and figures to show the result of the method. 
+
+explain the result 
+
+### Discussion
+
+the analysis of the result and the advantage of the result( how extend the result fit the research question),
+
+limitation of the result 
+
+further research (if possible)
+
+### Conclusion
+
+based on the result, give a summary to the research question.
+
 ## Research task
 
 1. Using ABM(agent-based modeling) method simulate the local traffic network.
