@@ -37,3 +37,11 @@ To me, it seems clear that this is still an artificial method of judgment based 
 
 Cools, S.-B., Gershenson, C. and D’Hooghe, B. (2008). ‘Self-organizing traffic lights: A
 realistic simulation’. in, pp. 41–50. doi: 10.1007/978-1-84628-982-8_3.
+
+
+### Article 3: The Benefits of Retiming Traffic Signals
+
+This paper shows the benefits of the development of smart traffic lights.
+
+#### Reference
+Harris JT (2005) Benefits of retiming traffic signals. Tech. rep., Institute of Transportation Engineers: annual meeting and exhibit compendium of technical papers
