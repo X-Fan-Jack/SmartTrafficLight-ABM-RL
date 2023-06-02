@@ -37,4 +37,3 @@ Zhang, H., Liu, X., Ji, H., Hou, Z. and Fan, L. (2019). ‘Multi-Agent-Based Dat
 Sunkari, S. 2004, "The Benefits of Retiming Traffic Signals", Institute of Transportation Engineers.ITE Journal, vol. 74, no. 4, pp. 26-29.   
 
 Sutton, R.S. and Barto, A.G., 2018. Reinforcement learning: An introduction. MIT press.   
-
