@@ -1,47 +1,37 @@
-# Literature Review
+# Reinforcement Learning and ABM for Traffic Signal Control: A Literature Review
 
-### Article 1: IntelliLight: A Reinforcement Learning Approach for Intelligent Traffic Light Control
+## 1. Introduction:
 
-#### Summary
+(Provide a brief overview of reinforcement learning, agent based model and their relevance to traffic signal control.)
 
-This paper seems using the basic reinforcement learning method(Q learning) to get the best signal pattern, but they claim that they use the Deep RL which confuse me a lot.
+Traffic congestion is one of the most common and vexing issues in modern cities. It not only results in sighnificant time wastage but also increases carbon emissions, thereby negatively impacting the environment, which conflicts with UN Sustainable Development Goals([Goal 11](https://www.un.org/sustainabledevelopment/cities/)).
 
-They use SUMO([Simulation of Urban MObility](https://www.eclipse.org/sumo/)), which is a open source lib developmed by German, to simulate the urban traffic flow.
+Control of traffic signals in the existing traffic network can effectively reduce traffic congestion and even reduce fuel consumption and financial expenditures. In the government economy, ***Srinivasa Sunkari mentions*** a example on San Jose Boulevard in Jacksonville, FL, which reduced average arterial delay by 35%, resulting in estimated annual fuel savings of 65,000 gallons and overall annunal cost savings of $2.5 million(2001).  Another example in Burlington, Canada, which remanaged the signal pattern in 62 intersections, observed 7% savings in travvel time, 6% savings in fuel consumption. And this project demonstrated an annual savings of $1.06 million for delays and fuel consumption alone(2001). 
 
-The result of the paper is good and shows that the using of real world data can make the model more reality relative.
+There are many way to optimize the pattern of the traffic signal to achive the 11th UN Sustainable Development Goal and many researchers have made their contribution in this area. 
 
-The highlight of this paper, in my view, is the using of the memory palace and the phase gate. These method enhace the long memory of the agent model.
+These researches mainly have three parts. The first part is simulating the urban traffic system by using some methods, the second part is using different methods to investigate the best proper pattern of the traffic signal and the third part of is how to evaluate these methods and how extend it can intergrated to the current traffic system. For example, Wei, Hua and his partners using SUMO([Simulation of Urban MObility](https://www.eclipse.org/sumo/)), which is a open source lib developmed by German, to simulate the urban road network and using reforcement learning to train a model to optimize the signal pattern. They used the real time statistic data from camera to train their model, which can make a higher correlation between their work and reality.make their work more reality. They also using the memory palace and the phase gate in their reforcement learning algorithm to enhance the long term memory ablilty and sensitivity of their model.
 
-#### Reference
+Traditional traffic signal control methods often adopt fixed-time intervals, which tend to be ineffective in the face of complex and ever-changing urban traffic flows. With the recent advancements in artificial intelligence and machine learning technologies, new tools have emerged to tackle traffic congestion, among which Reinforcement Learning (RL) shows immense potential. Reinforcement Learning is a method of machine learning that enables an agent to learn how to take actions in an environment to maximize some notion of cumulative reward. By employing RL algorithms, we can empower traffic signal control systems to self-learn how to make optimal decisions under various traffic situations, with the goal to minimize traffic congestion and enhance road traffic efficiency to the greatest extent. 
 
-Wei, H., Zheng, G., Yao, H. and Li, Z. (2018). ‘IntelliLight: A Reinforcement Learning
-Approach for Intelligent Traffic Light Control’. in  *Proceedings of the 24th
-ACM SIGKDD International Conference on Knowledge Discovery & Data Mining* .
-*KDD ’18: The 24th ACM SIGKDD International Conference on Knowledge Discovery
-and Data Mining* , London United Kingdom: ACM, pp. 2496–2505. doi:
-10.1145/3219819.3220096.
+## 2. Basics of Reinforcement Learning and ABM:
 
-### Article 2: Self-organizing Traffic Lights: A Realistic Simulation
+(Discuss the key concepts in reinforcement learning and ABM.)
 
-#### Summary
+## 3. Application in Traffic Signal Control:
 
-This paper is mentioned by the article 1 and I think this paper is quiet seems like my method - the ABM way.
+(Provide a detailed account of the applications of reinforcement learning and abm in traffic signal control.)
 
-In my opinion, the methodology of 'Self-organization' used in this paper is somewhat coincidental with the idea of ABM.
+### RL
 
-But the paper only consider the lenght of waiting cars and other factors to change the signal strategy. If a large number of waiting vehicles accumulate in front of the red light, the red light at that intersection changes to green.
+### ABM
 
-To me, it seems clear that this is still an artificial method of judgment based on a priori.  This method is a good basic decision method, although it ignores the influence of some potential factors on the decision.
+### Integrated Application
 
-#### Reference
+## 4. Discussion on Selected Literature:
 
-Cools, S.-B., Gershenson, C. and D’Hooghe, B. (2008). ‘Self-organizing traffic lights: A
-realistic simulation’. in, pp. 41–50. doi: 10.1007/978-1-84628-982-8_3.
+(Discuss the selected literature in detail, focusing on the methodology, problems addressed, and results obtained.)
 
+## 5. Conclusion and Future Works:
 
-### Article 3: The Benefits of Retiming Traffic Signals
-
-This paper shows the benefits of the development of smart traffic lights.
-
-#### Reference
-Harris JT (2005) Benefits of retiming traffic signals. Tech. rep., Institute of Transportation Engineers: annual meeting and exhibit compendium of technical papers
+(Conclude the review and discuss potential future directions in the application of reinforcement learning to traffic signal control.)
