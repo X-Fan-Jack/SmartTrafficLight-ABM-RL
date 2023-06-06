@@ -21,4 +21,4 @@ ABM, Traffic simulation, RL, ML, Intalli-signal,
 
 Word count: around 2000 words
 
-Literature count: around 15-20
+Literature count: around 20
