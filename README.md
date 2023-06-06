@@ -3,7 +3,8 @@
 Dissertation for MSc Urban Spatial Science, UCL
 
 word count: 10,000
-
+## Code 
+https://colab.research.google.com/drive/1GZ1X2KNOTN68E86C6_wf53uRRd-pA5E5?usp=sharing   
 ## Outline
 
 1. Introduction
