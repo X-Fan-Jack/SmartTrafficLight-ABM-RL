@@ -183,15 +183,16 @@ to-report is-blocked? [ target-patch ]
     any? other cars-on target-patch or
     any? (lights-on target-patch) with [ color = red ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 18
 10
-536
-529
+581
+574
 -1
 -1
-10.0
+5.5
 1
 10
 1
@@ -201,10 +202,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--25
-25
--25
-25
+-50
+50
+-50
+50
 0
 0
 1
@@ -212,10 +213,10 @@ ticks
 30.0
 
 BUTTON
-562
-15
-631
-48
+624
+49
+693
+82
 setup
 setup
 NIL
@@ -229,10 +230,10 @@ NIL
 1
 
 BUTTON
-564
-64
-627
-97
+626
+98
+689
+131
 go
 go
 T
@@ -246,10 +247,10 @@ NIL
 1
 
 BUTTON
-563
-115
-646
-148
+625
+149
+708
+182
 go once
 go
 NIL
@@ -263,21 +264,21 @@ NIL
 1
 
 SWITCH
-564
-190
-667
-223
+629
+201
+732
+234
 NS?
 NS?
-1
+0
 1
 -1000
 
 SLIDER
-783
-30
-1003
-63
+813
+28
+1033
+61
 traffic-flow-from-north
 traffic-flow-from-north
 0
@@ -289,10 +290,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-784
-93
-1004
-126
+814
+91
+1034
+124
 traffic-flow-from-south
 traffic-flow-from-south
 0
@@ -304,10 +305,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-786
-156
-999
-189
+816
+154
+1029
+187
 traffic-flow-from-east
 traffic-flow-from-east
 0
@@ -319,10 +320,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-787
-211
-1000
-244
+817
+209
+1030
+242
 traffic-flow-from-west
 traffic-flow-from-west
 0
@@ -334,10 +335,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1082
-21
-1254
-54
+1061
+25
+1233
+58
 speed-limit
 speed-limit
 0
@@ -349,10 +350,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1081
-76
-1253
-109
+1060
+80
+1232
+113
 max-accel
 max-accel
 0
@@ -364,10 +365,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1081
-133
-1253
-166
+1060
+137
+1232
+170
 max-brake
 max-brake
 0
@@ -379,10 +380,10 @@ NIL
 HORIZONTAL
 
 PLOT
-618
-312
-883
-535
+623
+274
+888
+497
 the count of waiting
 time
 waiting cars
@@ -401,10 +402,10 @@ PENS
 "S2N" 1.0 0 -11221820 true "" "plot count cars with [ heading = 0 and speed = 0 ]"
 
 PLOT
-895
-313
-1185
-533
+900
+275
+1190
+495
 Reward
 time
 reward
@@ -419,10 +420,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot reward"
 
 SLIDER
-562
-242
-739
-275
+1059
+211
+1236
+244
 min-switch-period
 min-switch-period
 60
@@ -456,10 +457,10 @@ initial-tips
 Number
 
 PLOT
-1227
-200
-1427
-350
+1265
+185
+1465
+335
 average waiting time
 time
 avg_wait
@@ -474,10 +475,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot avg-wait-time"
 
 PLOT
-1226
-375
-1430
-528
+1264
+360
+1468
+513
 avg-speed
 time
 avg-speed
