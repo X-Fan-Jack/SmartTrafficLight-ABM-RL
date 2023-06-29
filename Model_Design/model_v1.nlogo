@@ -4,6 +4,7 @@ globals[
   time
   average-speed
   average-wait
+  decision-countdown
 ]
 
 breed [lights light]
@@ -24,6 +25,7 @@ breed [gamers gamer]
 gamers-own[
   reward-list
   state
+  step-count
 ]
 
 to setup
@@ -55,24 +57,24 @@ to setup
   ask patch 1 2 [sprout-lights 1 [ set color red set state red set name "N2S" set direction "NS"] ]
 
   ;; Add a gamer at top-left
-  ask patch (min-pxcor + 3) (max-pycor - 3) [sprout-gamers 1 [set color red set size 3]]
+  ask patch (min-pxcor + 3) (max-pycor - 3) [sprout-gamers 1 [set color red set size 3 set step-count 0]]
 
   ;; set the Qlearning agent
   ask gamers [
     qlearningextension:state-def-extra [] [cars-count-on]
     (qlearningextension:actions [NS-pass] [EW-pass])
-    qlearningextension:reward [rewardFunc]
+    ;; qlearningextension:reward [rewardFunc]
     qlearningextension:end-episode [isEndState] resetEpisode
-    qlearningextension:action-selection "e-greedy" [0.8 0.08]
+    qlearningextension:action-selection "e-greedy" [0.8 0.5]
 
     ;; The learning rate determines how much we should consider new information.
     ;; If the learning rate is 0, then the learner will not learn new information and will rely only on prior knowledge.
     ;; Conversely, if the learning rate is 1, the learner will completely ignore old knowledge and rely only on new information.
-    qlearningextension:learning-rate 0.5
+    qlearningextension:learning-rate 0.7
     ;; The discount factor determines how much we value future rewards.
     ;; If the discount factor is 0, then we only care about immediate rewards and do not consider future rewards at all.
     ;; Conversely, if the discount factor is 1, we will treat all rewards at all time steps equally.
-    qlearningextension:discount-factor 0.75
+    qlearningextension:discount-factor 0.8
 
     ; used to create the plot
     create-temporary-plot-pen (word who)
@@ -83,18 +85,32 @@ to setup
 end
 
 to go
+  env-go
   ask gamers [
-    qlearningextension:learning
-    ;; move cars
-    ask cars [ move ]
-
-    ;; update cars state
-    ask cars with [speed = 0] [set wait-time wait-time + 1]
-    update-tips
-
-    ;; control to get the q table
-    ;;print(qlearningextension:get-qtable)
+    if decision-countdown <= 0 and step-count = 0[
+      qlearningextension:learning
+      ;; control to get the q table
+      ;; print(qlearningextension:get-qtable)
+      set decision-countdown cool-down
+    ]
+    ;; Decrease the countdown each tick
+    set decision-countdown decision-countdown - 1
   ]
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; function part ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to env-go
+  ;; move cars
+  ask cars [ move ]
+
+  ;; update cars state
+  ask cars with [speed = 0] [set wait-time wait-time + 1]
+  update-tips
+
 
   ;; generate new cars
   ;; N-S
@@ -107,12 +123,17 @@ to go
   make-new-car traffic-flow-from-west min-pxcor 1 90
 
   set time time + 1
+
+  ask gamers [
+    ifelse step-count < 5   ;; Bonus delay time 5ticks
+    [set step-count step-count + 1]
+    [
+      qlearningextension:reward [rewardFunc]
+      set step-count 0
+    ]
+  ]
 end
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;; function part ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 to NS-pass
@@ -124,7 +145,7 @@ end
 to EW-pass
   ask lights with [direction = "EW"] [set color green set state green]
   ask lights with [direction = "NS"] [set color red set state red]
- set signal-NS? false
+  set signal-NS? false
 end
 
 ;; add car into system base on the traffic flow data
@@ -196,7 +217,6 @@ to resetEpisode
     set length-rew length-rew + 1
   ]
   let avg-rew rew-sum / length-rew
-
   set-current-plot-pen (word who)
   plot avg-rew
 
@@ -211,7 +231,7 @@ end
 to-report rewardFunc
   ;; report the average speed
   set average-speed (sum [speed] of cars with [speed > 0] / (count cars with [speed > 0] + 1))
-  set average-wait (sum [wait-time] of cars with [speed = 0] / (count cars + 1))
+  set average-wait (sum [wait-time] of cars / (count cars + 1))
   let reward (average-speed - average-wait)
   set reward-list lput reward reward-list
   report reward
@@ -232,6 +252,7 @@ to-report next-blocked-patch
   ; report the blocked patch or nobody if I didn't find any
   report patch-to-check
 end
+
 
 ;; check stop or not
 to-report is-blocked? [ target-patch ]
@@ -254,18 +275,17 @@ end
 
 ;; 300 seconds an episode
 to-report isEndState
-  ifelse time >= 300  [report true] [report false]
+  ifelse time >= time-window [report true] [report false]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 8
 10
-421
-424
+436
+439
 -1
 -1
-15.0
+20.0
 1
 10
 1
@@ -275,10 +295,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--13
-13
--13
-13
+-10
+10
+-10
+10
 0
 0
 1
@@ -286,9 +306,9 @@ ticks
 30.0
 
 BUTTON
-474
+527
 31
-543
+596
 64
 NIL
 setup
@@ -303,9 +323,9 @@ NIL
 1
 
 BUTTON
-473
+526
 78
-544
+597
 111
 NIL
 go
@@ -320,9 +340,9 @@ NIL
 1
 
 INPUTBOX
-718
+771
 10
-873
+926
 70
 initial-tips
 5.0
@@ -331,9 +351,9 @@ initial-tips
 Number
 
 SLIDER
-445
+498
 300
-617
+670
 333
 speed-limit
 speed-limit
@@ -346,9 +366,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-444
+497
 341
-616
+669
 374
 max-accel
 max-accel
@@ -361,9 +381,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-444
+497
 383
-616
+669
 416
 max-brake
 max-brake
@@ -376,9 +396,9 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-717
+770
 76
-872
+925
 136
 waiting-cost
 1.0
@@ -387,50 +407,50 @@ waiting-cost
 Number
 
 SWITCH
-568
+621
 30
-701
+754
 63
 signal-NS?
 signal-NS?
-1
+0
 1
 -1000
 
 SLIDER
-445
+498
 142
-665
+718
 175
 traffic-flow-from-north
 traffic-flow-from-north
 0
 100
-25.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-444
+497
 182
-664
+717
 215
 traffic-flow-from-south
 traffic-flow-from-south
 0
 100
-25.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-445
+498
 221
-664
+717
 254
 traffic-flow-from-east
 traffic-flow-from-east
@@ -443,9 +463,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-445
+498
 259
-664
+717
 292
 traffic-flow-from-west
 traffic-flow-from-west
@@ -458,10 +478,10 @@ NIL
 HORIZONTAL
 
 PLOT
-13
-443
-425
-692
+975
+10
+1387
+259
 Ave Reward Per Episode
 NIL
 NIL
@@ -473,6 +493,28 @@ true
 false
 "" ""
 PENS
+
+INPUTBOX
+775
+159
+930
+219
+cool-down
+15.0
+1
+0
+Number
+
+INPUTBOX
+775
+239
+930
+299
+time-window
+180.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?

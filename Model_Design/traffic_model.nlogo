@@ -183,7 +183,6 @@ to-report is-blocked? [ target-patch ]
     any? other cars-on target-patch or
     any? (lights-on target-patch) with [ color = red ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 18
