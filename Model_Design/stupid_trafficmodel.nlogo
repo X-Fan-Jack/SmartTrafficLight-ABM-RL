@@ -433,7 +433,7 @@ SWITCH
 69
 signal-NS?
 signal-NS?
-1
+0
 1
 -1000
 
@@ -443,7 +443,7 @@ INPUTBOX
 526
 329
 cool-down
-60.0
+15.0
 1
 0
 Number
