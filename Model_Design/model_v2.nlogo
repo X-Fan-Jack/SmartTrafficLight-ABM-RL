@@ -264,7 +264,7 @@ to getValue
   set average-speed reduce [ [a b] -> a + b ] average-speed-list / length average-speed-list
 
 
-  ;;print(qlearningextension:get-qtable)
+  print(qlearningextension:get-qtable)
   print(pass-car)
   print(average-wait)
   print(average-drive)
@@ -309,7 +309,6 @@ to resetEpisode
   set time 0
   ask cars [die]
 
-  set pass-car 0
   set wait-time-list []
   set drive-time-list []
   set average-speed-list []
@@ -461,7 +460,7 @@ SWITCH
 80
 signal-NS?
 signal-NS?
-0
+1
 1
 -1000
 
