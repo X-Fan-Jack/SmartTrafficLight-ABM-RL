@@ -6,6 +6,11 @@ globals[
   average-wait
   average-drive
   pass-car
+  pass-car-t
+  pass-car-t1
+
+  reward
+  avg_reward
 
   average-speed-reward
   average-wait-reward
@@ -40,12 +45,20 @@ gamers-own[
   step-count
 ]
 
+breed [carmakers carmaker]
+carmakers-own[
+  direction
+]
 
+
+;; observer
 to setup
   clear-all
   set time 0
 
   set pass-car 0
+  set pass-car-t 0
+  set pass-car-t1 0
   set wait-time-list []
   set drive-time-list []
   set average-speed-list []
@@ -57,7 +70,7 @@ to setup
 
   ;; set the reward plot
   set-current-plot "Ave Reward Per Episode"
-  set-plot-y-range -10 10
+  set-plot-y-range -1 1
 
   ;; Create the road
   ask patches[
@@ -75,6 +88,12 @@ to setup
   ask patch -1 -2 [sprout-lights 1 [ set color red set state red set name "S2N" set direction "NS"] ]
   ask patch 1 2 [sprout-lights 1 [ set color red set state red set name "N2S" set direction "NS"] ]
 
+  ;; Create carmakers
+  ask patch 1 max-pycor [sprout-carmakers 1 [set direction 180 set heading direction]]
+  ask patch -1 min-pycor [sprout-carmakers 1 [set direction 0 set heading direction]]
+  ask patch max-pxcor -1 [sprout-carmakers 1 [set direction 270 set heading direction]]
+  ask patch min-pxcor 1 [sprout-carmakers 1 [set direction 90 set heading direction]]
+
   ;; Add a gamer at top-left
   ask patch (min-pxcor + 3) (max-pycor - 3) [sprout-gamers 1 [set color red set size 3]]
 
@@ -83,7 +102,7 @@ to setup
   ask gamers [
     qlearningextension:state-def-extra [] [cars-count-on]
     (qlearningextension:actions [NS-pass] [EW-pass])
-    ;; qlearningextension:reward [rewardFunc]
+    qlearningextension:reward [rewardFunc]
     qlearningextension:end-episode [isEndState] resetEpisode
     qlearningextension:action-selection "e-greedy" [0.9 0.9995]
     ;;qlearningextension:action-selection "random-normal" [0.8]
@@ -91,11 +110,11 @@ to setup
     ;; The learning rate determines how much we should consider new information.
     ;; If the learning rate is 0, then the learner will not learn new information and will rely only on prior knowledge.
     ;; Conversely, if the learning rate is 1, the learner will completely ignore old knowledge and rely only on new information.
-    qlearningextension:learning-rate 0.5
+    qlearningextension:learning-rate 0.3
     ;; The discount factor determines how much we value future rewards.
     ;; If the discount factor is 0, then we only care about immediate rewards and do not consider future rewards at all.
     ;; Conversely, if the discount factor is 1, we will treat all rewards at all time steps equally.
-    qlearningextension:discount-factor 0.9
+    qlearningextension:discount-factor 0.8
 
     ; used to create the plot
     create-temporary-plot-pen (word who)
@@ -108,14 +127,18 @@ end
 to go
   env-go
   ask gamers [
+    ;; learn?
     if decision-countdown <= 0 and step-count <= 0 and not cars-in-intersection?[
+      set pass-car-t length drive-time-list
       qlearningextension:learning
       set decision-countdown cool-down
     ]
+
     ;; Decrease the countdown each tick
     set decision-countdown decision-countdown - 1
-  ]
 
+
+  ]
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -123,11 +146,31 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;; cars move, update data, create new cars, time++
+to env-go
+  ;; move cars
+  ask cars [ move ]
+
+  ;; update cars state
+  ask cars with [speed = 0] [set wait-time wait-time + 1]
+  ask cars with [speed > 0] [set drive-time drive-time + 1]
+  update-tips
+
+  ;; generate new cars
+  ask carmakers with [direction = 180] [ make-new-car traffic-flow-from-north 1 max-pycor 180 ]
+  ask carmakers with [direction = 0] [ make-new-car traffic-flow-from-south -1 min-pycor 0 ]
+  ask carmakers with [direction = 270] [ make-new-car traffic-flow-from-east max-pxcor -1 270 ]
+  ask carmakers with [direction = 90] [ make-new-car traffic-flow-from-west min-pxcor 1 90 ]
+
+  set time time + 1
+
+end
+
 ;; add car into system base on the traffic flow data
 to make-new-car [freq x y h]
   ;; generate cars based on the freq. for example  if freq=50, it means it have 50% possibility to create a new car
   if (random-float 100 < freq) and not any? cars-on patch x y [
-    create-cars 1 [
+    hatch-cars 1 [
       setxy x y
       set heading h
       set color one-of base-colors
@@ -214,36 +257,8 @@ to update-tips
   ask cars with [speed = 0] [set tips tips - wait-cost]
 end
 
-to env-go
-  ;; move cars
-  ask cars [ move ]
-
-  ;; update cars state
-  ask cars with [speed = 0] [set wait-time wait-time + 1]
-  ask cars with [speed > 0] [set drive-time drive-time + 1]
-  update-tips
-
-
-  ;; generate new cars
-  ;; N-S
-  make-new-car traffic-flow-from-north 1 max-pycor 180
-  ;; S-N
-  make-new-car traffic-flow-from-south -1 min-pycor 0
-  ;; E-W
-  make-new-car traffic-flow-from-east max-pxcor -1 270
-  ;; W-E
-  make-new-car traffic-flow-from-west min-pxcor 1 90
-
-  set time time + 1
-
-  ask gamers [
-    ifelse step-count < bonus-delay   ;; Bonus delay time 5ticks
-    [set step-count step-count + 1]
-    [
-      qlearningextension:reward [rewardFunc]
-      set step-count 0
-    ]
-  ]
+to-report linear-normalize [value min-value max-value]
+  report (value - min-value) / (max-value - min-value + 1)
 end
 
 ;; report cars number waiting in 4 directions
@@ -286,12 +301,24 @@ to NS-pass
   ask lights with [direction = "NS"] [set color green set state green]
   ask lights with [direction = "EW"] [set color red set state red]
   set signal-NS? true
+  set step-count 0
+  repeat bonus-delay [
+    env-go
+  ]
+
+  set pass-car-t1 length drive-time-list
+
 end
 
 to EW-pass
   ask lights with [direction = "EW"] [set color green set state green]
   ask lights with [direction = "NS"] [set color red set state red]
   set signal-NS? false
+  repeat bonus-delay [
+    env-go
+  ]
+
+  set pass-car-t1 length drive-time-list
 end
 
 ;;;;;;;;;;;;;;;;;
@@ -326,6 +353,7 @@ to resetEpisode
   let avg-rew rew-sum / length-rew
   set-current-plot-pen (word who)
   plot avg-rew
+  set avg_reward avg-rew
 
   set reward-list []
 end
@@ -334,22 +362,24 @@ end
 ;;;; Reward Function ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Reward function: reward = average_speed - average_wait_time
+;; Reward function: reward = a * norm_average_speed - b * norm_average_wait_time + c * delta-pass-car
 to-report rewardFunc
+
   ifelse ((count cars with [speed > 0]) != 0) [
-    set average-speed-reward (sum [speed] of cars / (count cars))
+    set average-speed-reward linear-normalize (sum [speed] of cars / (count cars)) min [speed] of cars max [speed] of cars
   ] [
     set average-speed-reward 0
   ]
 
   ifelse ((count cars with [speed = 0]) != 0) [
-    set average-wait-reward (sum [wait-time] of cars / (count cars))
+    set average-wait-reward linear-normalize (sum [wait-time] of cars / (count cars)) min [wait-time] of cars max [wait-time] of cars
   ] [
     set average-wait-reward 0
   ]
 
-  let reward (10 * average-speed-reward - 0.5 * average-wait-reward)
+  set reward (0.2 * average-speed-reward - 0.3 * average-wait-reward + 0.5 * (pass-car-t1 - pass-car-t))
   set reward-list lput reward reward-list
+
   report reward
 end
 @#$#@#$#@
@@ -506,7 +536,7 @@ traffic-flow-from-east
 traffic-flow-from-east
 0
 100
-100.0
+25.0
 1
 1
 NIL
@@ -521,7 +551,7 @@ traffic-flow-from-west
 traffic-flow-from-west
 0
 100
-100.0
+25.0
 1
 1
 NIL
@@ -613,9 +643,9 @@ Ave Reward Per Episode
 NIL
 NIL
 0.0
-10.0
+1.0
 0.0
-10.0
+1.0
 true
 false
 "" ""
@@ -671,7 +701,7 @@ INPUTBOX
 1287
 103
 bonus-delay
-2.0
+1.0
 1
 0
 Number
@@ -1032,6 +1062,58 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment1" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="7200000"/>
+    <metric>reward</metric>
+    <metric>avg_reward</metric>
+    <metric>pass-car</metric>
+    <metric>average-speed</metric>
+    <metric>average-wait</metric>
+    <metric>average-drive</metric>
+    <enumeratedValueSet variable="cool-down">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-accel">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-west">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="bonus-delay">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-tips">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="time-window">
+      <value value="180"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wait-cost">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-south">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="signal-NS?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed-limit">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-brake">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-east">
+      <value value="25"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
