@@ -701,7 +701,7 @@ INPUTBOX
 1287
 103
 bonus-delay
-1.0
+3.0
 1
 0
 Number
@@ -1066,7 +1066,7 @@ NetLogo 6.3.0
   <experiment name="experiment1" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="7200000"/>
+    <timeLimit steps="1800000"/>
     <metric>reward</metric>
     <metric>avg_reward</metric>
     <metric>pass-car</metric>
@@ -1083,7 +1083,7 @@ NetLogo 6.3.0
       <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="bonus-delay">
-      <value value="1"/>
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-tips">
       <value value="100"/>
