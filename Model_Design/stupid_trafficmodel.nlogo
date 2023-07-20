@@ -308,7 +308,7 @@ traffic-flow-from-north
 traffic-flow-from-north
 0
 100
-10.0
+19.0
 1
 1
 NIL
@@ -323,7 +323,7 @@ traffic-flow-from-south
 traffic-flow-from-south
 0
 100
-10.0
+32.0
 1
 1
 NIL
@@ -338,7 +338,7 @@ traffic-flow-from-east
 traffic-flow-from-east
 0
 100
-25.0
+20.0
 1
 1
 NIL
@@ -353,7 +353,7 @@ traffic-flow-from-west
 traffic-flow-from-west
 0
 100
-25.0
+19.0
 1
 1
 NIL
@@ -498,7 +498,7 @@ switch-probability
 switch-probability
 0
 100
-75.0
+25.0
 1
 1
 NIL
@@ -862,10 +862,10 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment_stupid_signal" repetitions="10" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="10"/>
+    <timeLimit steps="500"/>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
@@ -880,12 +880,10 @@ NetLogo 6.3.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
+      <value value="32"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="switch-probability">
       <value value="25"/>
-      <value value="50"/>
-      <value value="75"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal-NS?">
       <value value="true"/>
@@ -894,26 +892,23 @@ NetLogo 6.3.0
       <value value="5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="25"/>
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-west">
+      <value value="19"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cool-down">
       <value value="15"/>
-      <value value="30"/>
-      <value value="45"/>
-      <value value="60"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="time-window">
       <value value="180"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="random-switch?">
-      <value value="true"/>
       <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="10"/>
+      <value value="19"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="max-brake">
       <value value="3"/>
