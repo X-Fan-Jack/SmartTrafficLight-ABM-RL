@@ -23,7 +23,7 @@ globals [
   last-decision2 ;; count the last decision time of signal-2
 
   reward
-  avg_reward
+  avg_reward ;; need output
   average-speed-reward
   average-wait-reward
 ]
@@ -576,7 +576,7 @@ SWITCH
 94
 signal1-NS?
 signal1-NS?
-0
+1
 1
 -1000
 
@@ -587,7 +587,7 @@ SWITCH
 141
 signal2-NS?
 signal2-NS?
-0
+1
 1
 -1000
 
@@ -1156,55 +1156,6 @@ NetLogo 6.3.0
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="10000"/>
-    <metric>pass-car ;; need output</metric>
-    <metric>average-speed ;; need output</metric>
-    <metric>average-wait ;; need output</metric>
-    <metric>average-drive ;; need output</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal2-NS?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal1-NS?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RL?">
-      <value value="false"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-1" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="4100000"/>
-    <metric>time</metric>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
@@ -1243,7 +1194,57 @@ NetLogo 6.3.0
       <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal1-NS?">
-      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RL?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="RL-BD-1" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="3600000"/>
+    <metric>time</metric>
+    <metric>pass-car</metric>
+    <metric>avg_reward</metric>
+    <metric>average-speed</metric>
+    <metric>average-wait</metric>
+    <metric>average-drive</metric>
+    <enumeratedValueSet variable="cool-down">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-west">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-accel">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="bonus-delay">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north1">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north2">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="time-window">
+      <value value="180"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="signal2-NS?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="switch-probability">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed-limit">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-brake">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="signal1-NS?">
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="RL?">
       <value value="true"/>
@@ -1252,9 +1253,10 @@ NetLogo 6.3.0
   <experiment name="RL-BD-2" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="4100000"/>
+    <timeLimit steps="3600000"/>
     <metric>time</metric>
     <metric>pass-car</metric>
+    <metric>avg_reward</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
@@ -1292,7 +1294,7 @@ NetLogo 6.3.0
       <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal1-NS?">
-      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="RL?">
       <value value="true"/>
@@ -1301,9 +1303,10 @@ NetLogo 6.3.0
   <experiment name="RL-BD-3" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="4100000"/>
+    <timeLimit steps="3600000"/>
     <metric>time</metric>
     <metric>pass-car</metric>
+    <metric>avg_reward</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
@@ -1341,7 +1344,7 @@ NetLogo 6.3.0
       <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal1-NS?">
-      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="RL?">
       <value value="true"/>
