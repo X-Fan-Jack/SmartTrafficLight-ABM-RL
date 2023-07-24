@@ -555,7 +555,7 @@ SWITCH
 463
 RL?
 RL?
-1
+0
 1
 -1000
 
@@ -576,7 +576,7 @@ SWITCH
 94
 signal1-NS?
 signal1-NS?
-1
+0
 1
 -1000
 
@@ -587,7 +587,7 @@ SWITCH
 141
 signal2-NS?
 signal2-NS?
-1
+0
 1
 -1000
 
@@ -707,7 +707,7 @@ INPUTBOX
 1318
 304
 bonus-delay
-3.0
+1.0
 1
 0
 Number
@@ -1203,12 +1203,12 @@ NetLogo 6.3.0
   <experiment name="RL-BD-1" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="1800000000"/>
+    <timeLimit steps="4100000"/>
     <metric>time</metric>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
-    <metric>verage-drive</metric>
+    <metric>average-drive</metric>
     <enumeratedValueSet variable="cool-down">
       <value value="15"/>
     </enumeratedValueSet>
@@ -1252,12 +1252,12 @@ NetLogo 6.3.0
   <experiment name="RL-BD-2" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="1800000000"/>
+    <timeLimit steps="4100000"/>
     <metric>time</metric>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
-    <metric>verage-drive</metric>
+    <metric>average-drive</metric>
     <enumeratedValueSet variable="cool-down">
       <value value="15"/>
     </enumeratedValueSet>
@@ -1301,12 +1301,12 @@ NetLogo 6.3.0
   <experiment name="RL-BD-3" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="1800000000"/>
+    <timeLimit steps="4100000"/>
     <metric>time</metric>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
-    <metric>verage-drive</metric>
+    <metric>average-drive</metric>
     <enumeratedValueSet variable="cool-down">
       <value value="15"/>
     </enumeratedValueSet>
