@@ -92,10 +92,15 @@ to go
 
   if random-switch? [
     while [time <= time-window] [
-      if (time - last-decision >= cool-down and random 100 <= switch-probability) [
-        switch
+      if (time - last-decision >= cool-down) [
+        let random-state random 100
+
+        ifelse random-state <= switch-probability [NS-pass] [EW-pass]
+
         set last-decision time
       ]
+
+
       env-go
     ]
   ]
@@ -106,9 +111,9 @@ to go
   set average-wait reduce [ [a b] -> a + b ] wait-time-list / length wait-time-list
   set average-drive reduce [ [a b] -> a + b ] drive-time-list / length drive-time-list
   set average-speed reduce [ [a b] -> a + b ] average-speed-list / length average-speed-list
-  print(pass-car)
-  print(average-drive)
-  print(average-speed)
+  ;;print(pass-car)
+  ;;print(average-drive)
+  ;;print(average-speed)
 end
 
 ;; do the simulation
@@ -498,7 +503,7 @@ switch-probability
 switch-probability
 0
 100
-25.0
+50.0
 1
 1
 NIL
@@ -862,14 +867,14 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="experiment_hyde" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="500"/>
+    <timeLimit steps="10000"/>
+    <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
-    <metric>pass-car</metric>
     <enumeratedValueSet variable="max-accel">
       <value value="3"/>
     </enumeratedValueSet>
@@ -883,7 +888,7 @@ NetLogo 6.3.0
       <value value="32"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
+      <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal-NS?">
       <value value="true"/>
