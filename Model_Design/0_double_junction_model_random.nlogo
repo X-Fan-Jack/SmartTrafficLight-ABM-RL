@@ -1,38 +1,46 @@
 extensions [qlearningextension]
 
-globals[
-  time
-  average-speed
-  average-wait
-  average-drive
-  pass-car
+globals [
+  time ;; need output
+
+  pass-car ;; need output
+  average-speed ;; need output
+  average-wait ;; need output
+  average-drive ;; need output
+
+  singal1_EW ;; need output
+  singal2_EW ;; need output
+
+  ;; need output the signal1-NS? and signal2-NS?
+
   pass-car-t
   pass-car-t1
 
-  reward
-  avg_reward
-
-  average-speed-reward
-  average-wait-reward
-
-  decision-countdown
-  last-decision
   wait-time-list
   drive-time-list
   average-speed-list
+
+  decision-countdown
+  last-decision
+  last-decision1 ;; count the last decision time of signal-1
+  last-decision2 ;; count the last decision time of signal-2
+
+  reward
+  avg_reward ;; need output
+  average-speed-reward
+  average-wait-reward
 ]
 
 breed [lights light]
 lights-own[
   name
-  state
   direction
+  signal-id
 ]
 
 breed [cars car]
 cars-own[
   speed
-  tips ;; each car will give reward to signal before it die
   wait-time
   drive-time
   speed-list
@@ -41,111 +49,84 @@ cars-own[
 breed [gamers gamer]
 gamers-own[
   reward-list
-  state
   step-count
 ]
 
 breed [carmakers carmaker]
 carmakers-own[
   direction
+  name
 ]
 
 
-;; observer
+
+
 to setup
   clear-all
-  set time 0
-
+  setup-env
+  set-QLearning
   set pass-car 0
   set pass-car-t 0
   set pass-car-t1 0
+  signal-update
   set wait-time-list []
   set drive-time-list []
   set average-speed-list []
-
-  ;; set shape
-  set-default-shape lights "circle"
-  set-default-shape cars "car"
-  set-default-shape gamers "person"
-
-  ;; set the reward plot
-  set-current-plot "Ave Reward Per Episode"
-  set-plot-y-range -1 1
-
-  ;; Create the road
-  ask patches[
-    ifelse abs pxcor <= 1 or abs pycor <= 1
-    [set pcolor black]
-    [set pcolor green]
-
-    if abs pxcor = 0 or abs pycor = 0 [set pcolor grey]
-    if abs pxcor <= 1 and abs pycor <= 1 [set pcolor black]
-  ]
-
-  ;; Create lights
-  ask patch 2 -1 [sprout-lights 1 [ set color green set state green set name "E2W" set direction "EW"] ]
-  ask patch -2 1 [sprout-lights 1 [ set color green set state green set name "W2E" set direction "EW"] ]
-  ask patch -1 -2 [sprout-lights 1 [ set color red set state red set name "S2N" set direction "NS"] ]
-  ask patch 1 2 [sprout-lights 1 [ set color red set state red set name "N2S" set direction "NS"] ]
-
-  ;; Create carmakers
-  ask patch 1 max-pycor [sprout-carmakers 1 [set direction 180 set heading direction]]
-  ask patch -1 min-pycor [sprout-carmakers 1 [set direction 0 set heading direction]]
-  ask patch max-pxcor -1 [sprout-carmakers 1 [set direction 270 set heading direction]]
-  ask patch min-pxcor 1 [sprout-carmakers 1 [set direction 90 set heading direction]]
-
-  ;; Add a gamer at top-left
-  ask patch (min-pxcor + 3) (max-pycor - 3) [sprout-gamers 1 [set color red set size 3]]
-
-
-  ;; set the Qlearning agent
-  ask gamers [
-    qlearningextension:state-def-extra [] [cars-count-on]
-    (qlearningextension:actions [NS-pass] [EW-pass])
-    qlearningextension:reward [rewardFunc]
-    qlearningextension:end-episode [isEndState] resetEpisode
-    qlearningextension:action-selection "e-greedy" [0.9 0.9995]
-    ;;qlearningextension:action-selection "random-normal" [0.8]
-
-    ;; The learning rate determines how much we should consider new information.
-    ;; If the learning rate is 0, then the learner will not learn new information and will rely only on prior knowledge.
-    ;; Conversely, if the learning rate is 1, the learner will completely ignore old knowledge and rely only on new information.
-    qlearningextension:learning-rate 0.3
-    ;; The discount factor determines how much we value future rewards.
-    ;; If the discount factor is 0, then we only care about immediate rewards and do not consider future rewards at all.
-    ;; Conversely, if the discount factor is 1, we will treat all rewards at all time steps equally.
-    qlearningextension:discount-factor 0.8
-
-    ; used to create the plot
-    create-temporary-plot-pen (word who)
-    set-plot-pen-color color
-    set reward-list []
-  ]
-
 end
 
 to go
-  env-go
-  ask gamers [
-    ;; learn?
-    if decision-countdown <= 0 and step-count <= 0 and not cars-in-intersection?[
-      set pass-car-t length drive-time-list
-      qlearningextension:learning
-      set decision-countdown cool-down
-    ]
+    ;; Random changing mode
 
-    ;; Decrease the countdown each tick
-    set decision-countdown decision-countdown - 1
-  ]
+    set time 0
+    set last-decision 0
+    ask cars [die]
+    set wait-time-list []
+    set drive-time-list []
+    set average-speed-list []
+    signal1-EW-pass
+    signal2-EW-pass
+
+    while [time <= time-window] [
+      if time - last-decision >= cool-down [
+        let random-state random 100
+        (
+          ifelse (random-state <= 25) [
+            ;; S1N S2N
+            signal1-NS-pass
+            signal2-NS-pass
+          ]
+          (random-state > 25 and random-state <= 50) [
+            ;; S1N S2E
+            signal1-NS-pass
+            signal2-EW-pass
+          ]
+          (random-state > 50 and random-state <= 75) [
+            ;; S1E S2N
+            signal1-EW-pass
+            signal2-NS-pass
+          ]
+          (random-state > 75 and random-state <= 100) [
+            ;; S1E S2E
+            signal1-EW-pass
+            signal2-EW-pass
+          ]
+        )
+        set last-decision time
+      ]
+
+      env-go
+    ]
+    getValue
+
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; Environment update ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 ;; cars move, update data, create new cars, time++
 to env-go
+  signal-update
   ;; move cars
   ask cars [ move ]
 
@@ -154,13 +135,86 @@ to env-go
   ask cars with [speed > 0] [set drive-time drive-time + 1]
 
   ;; generate new cars
-  ask carmakers with [direction = 180] [ make-new-car traffic-flow-from-north 1 max-pycor 180 ]
-  ask carmakers with [direction = 0] [ make-new-car traffic-flow-from-south -1 min-pycor 0 ]
-  ask carmakers with [direction = 270] [ make-new-car traffic-flow-from-east max-pxcor -1 270 ]
-  ask carmakers with [direction = 90] [ make-new-car traffic-flow-from-west min-pxcor 1 90 ]
+  ask carmakers with [name = "W"] [ make-new-car traffic-flow-from-west 0 1 90 ]
+  ask carmakers with [name = "N1"] [ make-new-car traffic-flow-from-north1 10 11 180 ]
+  ask carmakers with [name = "N2"] [ make-new-car traffic-flow-from-north2 21 11 180 ]
 
   set time time + 1
 
+end
+
+to signal-update
+  ifelse signal1-NS? [set singal1_EW 0] [set singal1_EW 1]
+  ifelse signal2-NS? [set singal2_EW 0] [set singal2_EW 1]
+end
+
+to signal1-switch
+  ifelse signal1-NS? [signal1-EW-pass] [signal1-NS-pass]
+end
+
+to signal2-switch
+  ifelse signal2-NS? [signal2-EW-pass] [signal2-NS-pass]
+end
+
+to signal1-NS-pass
+  ask lights with [signal-id = 1 and direction = "NS"] [set color green]
+  ask lights with [signal-id = 1 and direction = "EW"] [set color red]
+  set signal1-NS? true
+end
+
+to signal1-EW-pass
+  ask lights with [signal-id = 1 and direction = "NS"] [set color red]
+  ask lights with [signal-id = 1 and direction = "EW"] [set color green]
+  set signal1-NS? false
+end
+
+to signal2-NS-pass
+  ask lights with [signal-id = 2 and direction = "NS"] [set color green]
+  ask lights with [signal-id = 2 and direction = "EW"] [set color red]
+  set signal2-NS? true
+end
+
+to signal2-EW-pass
+  ask lights with [signal-id = 2 and direction = "NS"] [set color red]
+  ask lights with [signal-id = 2 and direction = "EW"] [set color green]
+  set signal2-NS? false
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; Environment Setting ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to setup-env
+
+  ;; set shape
+  set-default-shape lights "circle"
+  set-default-shape cars "car"
+  set-default-shape gamers "person"
+
+  ;; draw roads
+  ask patches[set pcolor green]
+  ask patches with [pycor = 1 or pxcor = 10 or pxcor = 21] [set pcolor black]
+
+  ;; place signals
+  ask patch 9 1 [sprout-lights 1 [ set color green set name "W2E1" set direction "EW" set signal-id 1] ]
+  ask patch 20 1 [sprout-lights 1 [ set color green set name "W2E2" set direction "EW" set signal-id 2] ]
+  ask patch 10 2 [sprout-lights 1 [ set color red set name "N2S1" set direction "NS" set signal-id 1] ]
+  ask patch 21 2 [sprout-lights 1 [ set color red set name "N2S2" set direction "NS" set signal-id 2] ]
+
+  ;; reset the signal state
+  signal1-EW-pass
+  signal2-EW-pass
+
+  ask patch 10 1 [set plabel "1"]
+  ask patch 21 1 [set plabel "2"]
+
+  ;; create car maker
+  ask patch 0 1 [sprout-carmakers 1 [set direction 90 set heading direction set name "W"]]
+  ask patch 10 11 [sprout-carmakers 1 [set direction 180 set heading direction set name "N1"]]
+  ask patch 21 11 [sprout-carmakers 1 [set direction 180 set heading direction set name "N2"]]
+
+  ;; Add a gamer at top-left
+  ask patch (min-pxcor + 3) (max-pycor - 3) [sprout-gamers 1 [set color red set size 3]]
 end
 
 ;; add car into system base on the traffic flow data
@@ -176,36 +230,6 @@ to make-new-car [freq x y h]
       adjust-speed
     ]
   ]
-end
-
-;; let all cars go
-to move
-  adjust-speed
-  repeat speed [
-    let target-patch patch-ahead 1
-    if not is-blocked? target-patch [
-      fd 1
-    ]
-    if not can-move? 1 [
-      set drive-time-list fput drive-time drive-time-list
-      set wait-time-list fput wait-time wait-time-list
-      set average-speed-list fput ((reduce [ [a b] -> a + b ] speed-list) / length speed-list) average-speed-list
-      die
-    ] ;; clear the car when it go out of the system
-  ]
-end
-
-;; check stop or not
-to-report is-blocked? [ target-patch ]
-  report
-    any? other cars-on target-patch or
-    any? (lights-on target-patch) with [ color = red ]
-end
-
-;; check the car in the intersection
-to-report cars-in-intersection?
-  report
-  any? cars with [ pxcor <= 1 and pxcor >= -1 and pycor <= 1 and pycor >= -1]
 end
 
 ;; adjust the speed to appropriate
@@ -248,23 +272,40 @@ to-report next-blocked-patch
   report patch-to-check
 end
 
+;; check stop or not
+to-report is-blocked? [ target-patch ]
+  report
+    any? other cars-on target-patch or
+    any? (lights-on target-patch) with [ color = red ]
+end
+
+;; check the car in the intersection
+to-report cars-in-intersection?
+  let junction1 patch 10 1
+  let junction2 patch 21 1
+
+  report any? cars-here with [patch-here = junction1 or patch-here = junction2]
+end
+
+;; let all cars go
+to move
+  adjust-speed
+  repeat speed [
+    let target-patch patch-ahead 1
+    if not is-blocked? target-patch [
+      fd 1
+    ]
+    if not can-move? 1 [
+      set drive-time-list fput drive-time drive-time-list
+      set wait-time-list fput wait-time wait-time-list
+      set average-speed-list fput ((reduce [ [a b] -> a + b ] speed-list) / length speed-list) average-speed-list
+      die
+    ] ;; clear the car when it go out of the system
+  ]
+end
 
 to-report linear-normalize [value min-value max-value]
   report (value - min-value) / (max-value - min-value + 1)
-end
-
-;; report cars number waiting in 4 directions
-to-report cars-count-on
-  let cars-count-list []
-
-  ;; Is there a need to reconsider the consideration of cars with speed in state space?
-  set cars-count-list fput count cars with [heading = 0 and pycor < 0 and speed = 0] cars-count-list   ;; from South
-  set cars-count-list fput count cars with [heading = 90 and pxcor < 0 and speed = 0] cars-count-list  ;; from West
-  set cars-count-list fput count cars with [heading = 180 and pycor > 0 and speed = 0] cars-count-list ;; from North
-  set cars-count-list fput count cars with [heading = 270 and pxcor > 0 and speed = 0] cars-count-list ;; from Eest
-
-
-  report cars-count-list
 end
 
 ;; calculate the global value
@@ -275,85 +316,107 @@ to getValue
   set average-drive reduce [ [a b] -> a + b ] drive-time-list / length drive-time-list
   set average-speed reduce [ [a b] -> a + b ] average-speed-list / length average-speed-list
 
-  ;;print(qlearningextension:get-qtable)
-end
 
+  ;;print(qlearningextension:get-qtable)
+
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; Q-Learning Setting ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+to set-QLearning
+  ;; set the Qlearning agent
+  ask gamers [
+    qlearningextension:state-def-extra [] [cars-count-on]
+    (qlearningextension:actions [NS1NS2] [NS1EW2] [EW1NS2] [EW1EW2])
+    qlearningextension:reward [rewardFunc]
+    qlearningextension:end-episode [isEndState] resetEpisode
+    qlearningextension:action-selection "e-greedy" [0.9 0.9995]
+    ;;qlearningextension:action-selection "random-normal" [0.8]
+
+    ;; The learning rate determines how much we should consider new information.
+    ;; If the learning rate is 0, then the learner will not learn new information and will rely only on prior knowledge.
+    ;; Conversely, if the learning rate is 1, the learner will completely ignore old knowledge and rely only on new information.
+    qlearningextension:learning-rate 0.3
+    ;; The discount factor determines how much we value future rewards.
+    ;; If the discount factor is 0, then we only care about immediate rewards and do not consider future rewards at all.
+    ;; Conversely, if the discount factor is 1, we will treat all rewards at all time steps equally.
+    qlearningextension:discount-factor 0.8
+
+    ; used to create the plot
+    create-temporary-plot-pen (word who)
+    set-plot-pen-color color
+    set reward-list []
+  ]
+end
+
+;; Get the environment for RL
+to-report cars-count-on
+  let cars-count-list []
+
+  set cars-count-list fput count cars with [(pxcor = 10 and pycor >= 2) or (pxcor = 10 and pycor <= 11)] cars-count-list   ;; from N1
+  set cars-count-list fput count cars with [(pxcor = 21 and pycor >= 2) or (pxcor = 21 and pycor <= 11)] cars-count-list  ;; from N2
+  set cars-count-list fput count cars with [(pycor = 1 and pxcor >= 0) or (pxcor = 1 and pxcor <= 9)] cars-count-list ;; from W
+  set cars-count-list fput count cars with [(pycor = 1 and pxcor >= 11) or (pycor = 1 and pxcor <= 20)] cars-count-list ;; from W2
+
+  report cars-count-list
+end
+
 ;;;;;;;;;;;;;;;;;
 ;;;; Actions ;;;;
 ;;;;;;;;;;;;;;;;;
-to NS-pass
-  ask lights with [direction = "NS"] [set color green set state green]
-  ask lights with [direction = "EW"] [set color red set state red]
-  set signal-NS? true
+
+;; R means red signal; G means green signal; 1 means signal 1 and 2 means signal 2
+
+to NS1NS2
+  signal1-NS-pass
+  signal2-NS-pass
+
   set step-count 0
   repeat bonus-delay [
     env-go
   ]
-
   set pass-car-t1 length drive-time-list
-
 end
 
-to EW-pass
-  ask lights with [direction = "EW"] [set color green set state green]
-  ask lights with [direction = "NS"] [set color red set state red]
-  set signal-NS? false
+to NS1EW2
+  signal1-NS-pass
+  signal2-EW-pass
+
+  set step-count 0
   repeat bonus-delay [
     env-go
   ]
-
   set pass-car-t1 length drive-time-list
 end
 
-;;;;;;;;;;;;;;;;;
-;;;; Episode ;;;;
-;;;;;;;;;;;;;;;;;
+to EW1NS2
+  signal1-EW-pass
+  signal2-NS-pass
 
-;; 180 seconds an episode
-to-report isEndState
-  ifelse time >= time-window [report true] [report false]
+  set step-count 0
+  repeat bonus-delay [
+    env-go
+  ]
+  set pass-car-t1 length drive-time-list
 end
 
-;; reset the episode
-to resetEpisode
-  ;; calculate the value before reset
-  getValue
+to EW1EW2
+  signal1-EW-pass
+  signal2-EW-pass
 
-
-  set time 0
-  ask cars [die]
-
-  set wait-time-list []
-  set drive-time-list []
-  set average-speed-list []
-
-  ;; used to update the plot
-  let rew-sum 0
-  let length-rew 0
-  foreach reward-list [ r ->
-    set rew-sum rew-sum + r
-    set length-rew length-rew + 1
+  set step-count 0
+  repeat bonus-delay [
+    env-go
   ]
-  let avg-rew rew-sum / length-rew
-  set-current-plot-pen (word who)
-  plot avg-rew
-  set avg_reward avg-rew
-
-  set reward-list []
+  set pass-car-t1 length drive-time-list
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Reward Function ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Reward function: reward = a * norm_average_speed - b * norm_average_wait_time + c * delta-pass-car
 to-report rewardFunc
-
   ifelse ((count cars with [speed > 0]) != 0) [
     set average-speed-reward linear-normalize (sum [speed] of cars / (count cars)) min [speed] of cars max [speed] of cars
   ] [
@@ -371,15 +434,47 @@ to-report rewardFunc
 
   report reward
 end
+
+;;;;;;;;;;;;;;;;;
+;;;; Episode ;;;;
+;;;;;;;;;;;;;;;;;
+
+to-report isEndState
+  ifelse time >= time-window [report true] [report false]
+end
+
+to resetEpisode
+  ;; calculate the value before reset
+  getValue
+  ;; used to update the plot
+  let rew-sum 0
+  let length-rew 0
+  foreach reward-list [ r ->
+    set rew-sum rew-sum + r
+    set length-rew length-rew + 1
+  ]
+  let avg-rew rew-sum / length-rew
+  set-current-plot-pen (word who)
+  plot avg-rew
+  set avg_reward avg-rew
+
+  set reward-list []
+  set time 0
+  ask cars [die]
+  set wait-time-list []
+  set drive-time-list []
+  set average-speed-list []
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-7
+9
 10
-330
-334
+592
+319
 -1
 -1
-15.0
+25.0
 1
 10
 1
@@ -389,10 +484,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--10
-10
--10
-10
+0
+22
+0
+11
 0
 0
 1
@@ -400,10 +495,10 @@ ticks
 30.0
 
 BUTTON
-358
-18
-427
-51
+641
+11
+710
+44
 NIL
 setup
 NIL
@@ -417,13 +512,13 @@ NIL
 1
 
 BUTTON
-360
-76
-423
-109
+639
+62
+818
+95
+Go for Random model 
+go\n
 NIL
-go
-T
 1
 T
 OBSERVER
@@ -434,20 +529,20 @@ NIL
 1
 
 TEXTBOX
-359
-143
-509
-161
-environment
+633
+178
+783
+196
+Environment
 12
 0.0
 1
 
 INPUTBOX
-358
-170
-513
-230
+634
+209
+789
+269
 time-window
 180.0
 1
@@ -455,10 +550,10 @@ time-window
 Number
 
 INPUTBOX
-359
-240
-514
-300
+636
+294
+791
+354
 cool-down
 15.0
 1
@@ -466,76 +561,72 @@ cool-down
 Number
 
 TEXTBOX
-582
-12
-732
-30
+897
+36
+1047
+54
 Traffic
 12
 0.0
 1
 
 SWITCH
-582
-47
-715
-80
-signal-NS?
-signal-NS?
+897
+61
+1021
+94
+signal1-NS?
+signal1-NS?
+1
+1
+-1000
+
+SWITCH
+898
+108
+1024
+141
+signal2-NS?
+signal2-NS?
 1
 1
 -1000
 
 SLIDER
-580
-104
-800
-137
-traffic-flow-from-north
-traffic-flow-from-north
+897
+156
+1125
+189
+traffic-flow-from-north1
+traffic-flow-from-north1
 0
 100
-10.0
+20.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-580
-145
-800
-178
-traffic-flow-from-south
-traffic-flow-from-south
-0
-100
-10.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-579
-200
-800
-233
-traffic-flow-from-east
-traffic-flow-from-east
-0
-100
-30.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-578
+897
+209
+1125
 242
-802
-275
+traffic-flow-from-north2
+traffic-flow-from-north2
+0
+100
+20.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+896
+261
+1126
+294
 traffic-flow-from-west
 traffic-flow-from-west
 0
@@ -547,20 +638,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-890
-14
-1040
-32
+1166
+41
+1316
+59
 Cars
 12
 0.0
 1
 
 SLIDER
-889
-38
-1061
-71
+1166
+72
+1338
+105
 speed-limit
 speed-limit
 0
@@ -572,10 +663,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-889
-80
-1061
-113
+1165
+115
+1337
+148
 max-brake
 max-brake
 0
@@ -587,10 +678,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-888
-122
-1060
-155
+1165
+157
+1337
+190
 max-accel
 max-accel
 0
@@ -601,50 +692,49 @@ max-accel
 NIL
 HORIZONTAL
 
+TEXTBOX
+1165
+214
+1315
+232
+Q-Learning Setting
+12
+0.0
+1
+
+INPUTBOX
+1163
+244
+1318
+304
+bonus-delay
+1.0
+1
+0
+Number
+
 PLOT
-15
-376
-637
-563
+8
+339
+591
+557
 Ave Reward Per Episode
 NIL
 NIL
 0.0
 1.0
 0.0
-0.0
+1.0
 true
 false
 "" ""
 PENS
 
 MONITOR
-773
-330
-871
-375
-NIL
-average-speed
-17
-1
-11
-
-MONITOR
-665
-387
-761
-432
-NIL
-average-wait
-17
-1
-11
-
-MONITOR
-665
-330
-761
-375
+935
+372
+1033
+417
 NIL
 pass-car
 17
@@ -652,36 +742,37 @@ pass-car
 11
 
 MONITOR
-774
-386
-871
+935
 431
+1032
+476
+NIL
+average-speed
+17
+1
+11
+
+MONITOR
+1055
+372
+1145
+417
+NIL
+average-wait
+17
+1
+11
+
+MONITOR
+1053
+431
+1150
+476
 NIL
 average-drive
 17
 1
 11
-
-INPUTBOX
-888
-207
-1043
-267
-bonus-delay
-3.0
-1
-0
-Number
-
-TEXTBOX
-888
-179
-1038
-197
-Q-Learning Setting
-12
-0.0
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1030,83 +1121,37 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="bd_2_RL" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="simu" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
+    <timeLimit steps="10000"/>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
+    <enumeratedValueSet variable="cool-down">
+      <value value="15"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-west">
       <value value="30"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="max-accel">
       <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="22"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="bd_1_RL" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
-    <metric>pass-car</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="bonus-delay">
       <value value="1"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north1">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north2">
+      <value value="20"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="time-window">
       <value value="180"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
+    <enumeratedValueSet variable="signal2-NS?">
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
@@ -1114,175 +1159,41 @@ NetLogo 6.3.0
     <enumeratedValueSet variable="max-brake">
       <value value="3"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="22"/>
+    <enumeratedValueSet variable="signal1-NS?">
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="bd_3_RL" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="sample" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
+    <timeLimit steps="10000"/>
     <metric>pass-car</metric>
     <metric>average-speed</metric>
     <metric>average-wait</metric>
     <metric>average-drive</metric>
+    <enumeratedValueSet variable="cool-down">
+      <value value="15"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-west">
       <value value="30"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="max-accel">
       <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="22"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="bd_3_RL_simu" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
-    <metric>pass-car</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="30"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="bd_2_RL_simu" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
-    <metric>pass-car</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="30"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="bd_1_RL_simu" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="3600000"/>
-    <metric>time</metric>
-    <metric>avg_reward</metric>
-    <metric>pass-car</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="bonus-delay">
       <value value="1"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north1">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north2">
+      <value value="3"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="time-window">
       <value value="180"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-south">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="signal-NS?">
-      <value value="true"/>
+    <enumeratedValueSet variable="signal2-NS?">
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
@@ -1290,8 +1201,8 @@ NetLogo 6.3.0
     <enumeratedValueSet variable="max-brake">
       <value value="3"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-east">
-      <value value="30"/>
+    <enumeratedValueSet variable="signal1-NS?">
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

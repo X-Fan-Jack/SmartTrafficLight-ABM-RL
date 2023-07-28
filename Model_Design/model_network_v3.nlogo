@@ -578,10 +578,10 @@ cool-down
 Number
 
 SWITCH
-633
-430
-796
-463
+634
+380
+797
+413
 RL?
 RL?
 1
@@ -740,21 +740,6 @@ bonus-delay
 1
 0
 Number
-
-SLIDER
-634
-374
-794
-407
-switch-probability
-switch-probability
-0
-100
-25.0
-1
-1
-NIL
-HORIZONTAL
 
 PLOT
 8
@@ -1181,7 +1166,7 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment-stupid-model" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="simu" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="10000"/>
@@ -1212,9 +1197,6 @@ NetLogo 6.3.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal2-NS?">
       <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
@@ -1265,9 +1247,6 @@ NetLogo 6.3.0
     <enumeratedValueSet variable="signal2-NS?">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
     </enumeratedValueSet>
@@ -1314,9 +1293,6 @@ NetLogo 6.3.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="signal2-NS?">
       <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
@@ -1365,9 +1341,6 @@ NetLogo 6.3.0
     <enumeratedValueSet variable="signal2-NS?">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="switch-probability">
-      <value value="25"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="speed-limit">
       <value value="5"/>
     </enumeratedValueSet>
@@ -1379,6 +1352,51 @@ NetLogo 6.3.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="RL?">
       <value value="true"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="sample" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="10000"/>
+    <metric>pass-car</metric>
+    <metric>average-speed</metric>
+    <metric>average-wait</metric>
+    <metric>average-drive</metric>
+    <enumeratedValueSet variable="cool-down">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-west">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-accel">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="bonus-delay">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north1">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="traffic-flow-from-north2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="time-window">
+      <value value="180"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="signal2-NS?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed-limit">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-brake">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="signal1-NS?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RL?">
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
