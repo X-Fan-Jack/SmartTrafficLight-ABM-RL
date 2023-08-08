@@ -32,7 +32,6 @@ lights-own[
 breed [cars car]
 cars-own[
   speed
-  tips ;; each car will give reward to signal before it die
   wait-time
   drive-time
   speed-list
