@@ -470,38 +470,21 @@ NIL
 NIL
 1
 
-BUTTON
-639
-62
-818
-95
-Go for Random model 
-go\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 TEXTBOX
-633
-178
-783
-196
+637
+131
+787
+149
 Environment
 12
 0.0
 1
 
 INPUTBOX
-634
-209
-789
-269
+638
+162
+793
+222
 time-window
 180.0
 1
@@ -509,10 +492,10 @@ time-window
 Number
 
 INPUTBOX
-636
-294
-791
-354
+640
+247
+795
+307
 cool-down
 15.0
 1
@@ -536,7 +519,7 @@ SWITCH
 94
 signal1-NS?
 signal1-NS?
-1
+0
 1
 -1000
 
@@ -575,7 +558,7 @@ traffic-flow-from-north2
 traffic-flow-from-north2
 0
 100
-3.0
+10.0
 1
 1
 NIL
@@ -667,7 +650,7 @@ INPUTBOX
 1318
 304
 bonus-delay
-3.0
+1.0
 1
 0
 Number
@@ -734,10 +717,10 @@ average-drive
 11
 
 BUTTON
-638
-110
-736
-143
+642
+63
+740
+96
 Go for RL
 go
 T
@@ -1122,210 +1105,10 @@ NetLogo 6.3.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-north1">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-2" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="2700000"/>
-    <metric>time</metric>
-    <metric>pass-car</metric>
-    <metric>avg_reward</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <metric>singal1_EW</metric>
-    <metric>singal2_EW</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-3" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="2700000"/>
-    <metric>time</metric>
-    <metric>pass-car</metric>
-    <metric>avg_reward</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <metric>singal1_EW</metric>
-    <metric>singal2_EW</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-1-sample" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="2700000"/>
-    <metric>time</metric>
-    <metric>pass-car</metric>
-    <metric>avg_reward</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <metric>singal1_EW</metric>
-    <metric>singal2_EW</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-2-sample" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="2700000"/>
-    <metric>time</metric>
-    <metric>pass-car</metric>
-    <metric>avg_reward</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <metric>singal1_EW</metric>
-    <metric>singal2_EW</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
       <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="time-window">
-      <value value="180"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="speed-limit">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-brake">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="RL-BD-3-sample" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="2700000"/>
-    <metric>time</metric>
-    <metric>pass-car</metric>
-    <metric>avg_reward</metric>
-    <metric>average-speed</metric>
-    <metric>average-wait</metric>
-    <metric>average-drive</metric>
-    <metric>singal1_EW</metric>
-    <metric>singal2_EW</metric>
-    <enumeratedValueSet variable="cool-down">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-west">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="max-accel">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="bonus-delay">
-      <value value="3"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north1">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="traffic-flow-from-north2">
-      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="time-window">
       <value value="180"/>
